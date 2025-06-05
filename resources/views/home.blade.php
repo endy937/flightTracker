@@ -2,7 +2,7 @@
 
 @section('title', 'Command Center Mpsr')
 
-<body>
+@section('maps')
     <div id="map" class="map"> </div>
     <!-- popup info pesawat -->
     <div class="left-popup-menu" id="leftPopupMenuP">
@@ -13,6 +13,7 @@
         </div>
         <div class="popup-content-pesawat" id="popupContentP"></div>
     </div>
+
 
     <!-- pop up pilih map -->
     <div class="left-popup-menu" id="leftPopupMenu">
@@ -71,15 +72,16 @@
         <button class="close-btn" onclick="toggleLeftPopupMenuWeather()">&times;</button>
         <div class="popup-header">Weather</div>
     </div>
-
+@endsection
+@section('bar')
     <div class="bottom-bar">
         <button onclick="toggleLeftPopupMenu()"><img src="{{ asset('home/assets/images/settings.png') }}"></button>
-        <button onclick="toggleLeftPopupMenuWeather()"><img
-                src="{{ asset('home/assets/images/weather.png') }}"></button>
-        <button onclick="toggleLeftPopupMenuStatus()"><img
-                src="{{ asset('home/assets/images/radarrev.png') }}"></button>
+        <button onclick="toggleLeftPopupMenuWeather()"><img src="{{ asset('home/assets/images/weather.png') }}"></button>
+        <button onclick="toggleLeftPopupMenuStatus()"><img src="{{ asset('home/assets/images/radarrev.png') }}"></button>
         <button onclick="toggleLeftPopupMenuReport()"><img src="{{ asset('home/assets/images/report.png') }}"></button>
         <button onclick="toggleLeftPopupMenuNotif()"><img src="{{ asset('home/assets/images/notif.png') }}"></button>
-
+        <button id="btnShowLocation">📍 Show My Location</button>
     </div>
-</body>
+
+
+@endsection

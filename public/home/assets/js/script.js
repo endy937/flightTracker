@@ -64,26 +64,51 @@ function updateMarker(flightData) {
     }
 }
 
+//informasi data
 function showFlightDetails(flightData) {
     const {
-        callsign,
+        latitude,
+        longitude,
+        id,
+        icao24bit,
+        heading,
         altitude,
         groundSpeed,
         aircraftCode,
+        registration,
+        time,
+        originAirportIata,
+        destinationAirportIata,
+        number,
+        airlineIata,
         onGround,
         verticalSpeed,
+        callsign,
+        airlineIcao,
     } = flightData;
 
+    // Bisa kamu format waktu timestamp jadi readable juga jika perlu
+    const timeString = new Date(time * 1000).toLocaleString();
+
     const popupContentP = `
-                <strong>Callsign:</strong> ${callsign}<br>
-                <strong>Altitude:</strong> ${altitude} ft<br>
-                <strong>Speed:</strong> ${groundSpeed} knots<br>
-                <strong>Aircraft:</strong> ${aircraftCode}<br>
-                <strong>Status:</strong> ${
-                    onGround ? "On Ground" : "In Flight"
-                }<br>
-                <strong>Vertical Speed:</strong> ${verticalSpeed} ft/min
-            `;
+        <strong>Callsign:</strong> ${callsign}<br>
+        <strong>Airline ICAO:</strong> ${airlineIcao}<br>
+        <strong>Flight Number:</strong> ${number}<br>
+        <strong>Aircraft Code:</strong> ${aircraftCode}<br>
+        <strong>Registration:</strong> ${registration}<br>
+        <strong>Altitude:</strong> ${altitude} ft<br>
+        <strong>Speed:</strong> ${groundSpeed} knots<br>
+        <strong>Vertical Speed:</strong> ${verticalSpeed} ft/min<br>
+        <strong>Heading:</strong> ${heading}°<br>
+        <strong>Status:</strong> ${onGround ? "On Ground" : "In Flight"}<br>
+        <strong>Origin Airport:</strong> ${originAirportIata}<br>
+        <strong>Destination Airport:</strong> ${destinationAirportIata}<br>
+        <strong>Latitude:</strong> ${latitude}<br>
+        <strong>Longitude:</strong> ${longitude}<br>
+        <strong>ICAO 24-bit:</strong> ${icao24bit}<br>
+        <strong>ID:</strong> ${id}<br>
+        <strong>Timestamp:</strong> ${timeString}
+    `;
 
     document.getElementById("popupContentP").innerHTML = popupContentP;
     document.getElementById("leftPopupMenuP").classList.add("active");
@@ -125,12 +150,6 @@ document.getElementById("brightnessRange").addEventListener("input", (e) => {
     document.getElementById(
         "map"
     ).style.filter = `brightness(${e.target.value})`;
-});
-
-// Day/Night Line Toggle
-document.getElementById("dayNightToggle").addEventListener("change", (e) => {
-    if (e.target.checked) console.log("Day/Night line enabled");
-    else console.log("Day/Night line disabled");
 });
 
 // Map Modes
