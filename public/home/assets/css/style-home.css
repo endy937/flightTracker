@@ -1,0 +1,783 @@
+body,
+html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+.map {
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+}
+/* #map{
+    height: 100%;
+    width: 100%;
+    filter: brightness(1);
+    transition: filter 0.3s;
+
+} */
+.map-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 10%; /* Sesuaikan tinggi overlay */
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.434),
+        rgba(0, 0, 0, 0)
+    );
+    pointer-events: none;
+    z-index: 500;
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.3),
+        rgba(0, 0, 0, 0)
+    );
+    padding: 9px 8px;
+    z-index: 1000;
+}
+.header .logo {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.header .logo img {
+    height: 50px;
+    width: 100%;
+}
+
+.header .user-search {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+.header .search {
+    position: relative;
+    margin-right: 20px;
+}
+
+.header .search input {
+    width: 273px;
+    height: 33px;
+    padding: 4px 10px 5px 35px; /* Tambahkan ruang di sisi kiri untuk ikon */
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+.header .search .icon {
+    position: absolute;
+    left: 12px; /* Posisikan ikon di kiri */
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: #888;
+    pointer-events: none;
+    display: block;
+}
+
+.header .user-logo {
+    display: block;
+    margin-right: 40px;
+    font-size: 24px;
+}
+
+.header .user-logo button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: white;
+}
+
+.header .hamburger-menu {
+    margin: 0 15px 0 15px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 20px;
+    width: 25px;
+}
+
+.header .hamburger-menu div {
+    background-color: #ffffff; /* Warna garis */
+    height: 3px; /* Ketebalan garis */
+    width: 100%; /* Panjang garis */
+    border-radius: 2px; /* Membulatkan sedikit sudut */
+    transition: background-color 0.3s; /* Animasi perubahan warna */
+}
+
+.header .hamburger-menu:hover div {
+    background-color: #ffd700; /* Warna kuning saat hover */
+}
+
+/* Responsiveness */
+@media (max-width: 1024px) {
+    .header .search input {
+        width: 200px;
+    }
+    .header .logo img {
+        height: 40px;
+        width: 100px;
+    }
+    .header .user-logo img {
+        height: 28px;
+    }
+    .header .hamburger-menu {
+        height: 20px;
+        width: 25px;
+    }
+    .header .hamburger-menu div {
+        height: 3px;
+    }
+}
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        padding: 10px 5px;
+    }
+    .header .user-search {
+        margin-left: 0;
+        justify-content: space-between;
+        width: 100%;
+    }
+    .header .search input {
+        width: 150px;
+    }
+    .header .logo {
+        order: -1;
+    }
+    .header .user-logo img,
+    .header .hamburger-menu {
+        margin-top: 5px;
+    }
+    .header .hamburger-menu div {
+        background-color: #000;
+    }
+}
+@media (max-width: 480px) {
+    .header .search input {
+        display: none;
+    }
+    .header .user-search {
+        justify-content: flex-end;
+    }
+    .header .logo img {
+        width: 80px;
+    }
+}
+
+.popup-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 310px;
+    height: 100%;
+    background-color: #ffffff;
+    box-shadow: -4px 0 8px rgba(0, 0, 0, 0.2);
+    z-index: 2000;
+    transition: right 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.popup-menu.active {
+    right: 0;
+}
+
+.popup-menu .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 24px;
+    background: none;
+    border: none;
+    color: #dfd4d4;
+}
+
+.popup-menu .close-btn:hover {
+    color: #000;
+}
+
+.popup-menu .atas {
+    padding: 20px;
+    text-align: center;
+    background-color: #d4d4d4;
+    color: white;
+    font-size: 18px;
+}
+
+.popup-menu .tengah {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+.popup-menu .menu a {
+    text-decoration: none;
+    color: #007bff;
+    font-size: 16px;
+}
+
+.popup-menu .bawah {
+    padding: 20px;
+    text-align: center;
+    background-color: #ffffff;
+}
+
+.popup-menu .footer .social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.popup-menu .footer .social-icons i {
+    font-size: 20px;
+    color: #ffffff;
+}
+
+.popup-menu .footer p {
+    margin: 0;
+    font-size: 14px;
+    color: #f8f3ff;
+}
+
+.left-popup-menu {
+    position: fixed;
+    top: 20px;
+    left: -320px;
+    width: 310px;
+    height: calc(100% - 40px);
+    background-color: #1b1e23;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+    transition: left 0.3s ease, border-radius 0.3s ease;
+    padding: 10px;
+    border-radius: 10px;
+    flex-direction: column;
+    display: inline;
+    display: flex;
+}
+
+.left-popup-menu.active {
+    left: 15px;
+}
+
+.left-popup-menu .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    background: none;
+    border: none;
+    color: #ffffff;
+}
+
+.popup-header {
+    text-align: center;
+    color: white;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+.popup-navbar {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.popup-navbar a {
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+}
+
+.judul h2 {
+    color: #fff;
+    font-size: 15px;
+}
+
+.judul h4 {
+    color: #fff;
+    font-size: 15px;
+}
+
+.popup-content {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px 10px;
+    margin-bottom: 20px;
+}
+.popup-content-pesawat {
+    flex: 1;
+    grid-template-columns: repeat(3, 1fr);
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+.popup-content .map-mode {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.3s;
+    overflow: hidden;
+    background-color: #2c2f34;
+}
+
+.popup-content .map-mode img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.popup-content .map-mode .label-bottom {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    right: 5px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 3px 5px;
+    border-radius: 3px;
+    font-size: 8px;
+}
+.popup-content .map-mode .label-bottom:hover {
+    background-color: rgba(255, 166, 0, 0.8);
+}
+
+.popup-content .map-mode:hover {
+    transform: scale(1.05);
+}
+
+.brightness-control {
+    text-align: center;
+    margin: 10px 0;
+    color: white;
+    margin-top: -0px;
+}
+
+.day-night-control {
+    text-align: center;
+    margin: 10px 0;
+    color: white;
+}
+
+.popup-footer {
+    text-align: center;
+    color: white;
+    font-size: 0.9rem;
+    position: absolute;
+    bottom: 10px;
+    width: calc(100% - 20px);
+}
+
+.popup-pesawat-left {
+    position: fixed;
+    top: 10px;
+    left: -100%;
+    width: 300px;
+    height: calc(92% - 10px);
+    background-color: #f8f9fa;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+    transition: left 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    border-radius: 9px;
+    margin: 10px;
+}
+.popup-pesawat-left.active {
+    left: 10px;
+}
+.popup-pesawat-header {
+    padding: 10px;
+    background-color: #1b1e23;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+.popup-pesawat-header .title {
+    display: flex;
+    flex-direction: column;
+}
+.popup-pesawat-header .title .flight {
+    font-size: 18px;
+    font-weight: bold;
+}
+.popup-pesawat-header .title .airline {
+    font-size: 14px;
+    font-weight: normal;
+}
+.popup-pesawat-header .close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+}
+.popup-pesawat-header .logo {
+    text-align: right;
+    margin-top: 5px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.8);
+}
+.popup-pesawat-image img {
+    height: auto;
+    width: 300px;
+}
+.popup-pesawat-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+}
+.popup-pesawat-footer {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px;
+    background-color: #1b1e23;
+    border-top: 1px solid #ddd;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+.popup-pesawat-footer .icon {
+    font-size: 24px;
+    cursor: pointer;
+    transition: color 0.3s;
+    color: aliceblue;
+}
+.popup-pesawat-footer .icon:hover {
+    color: #007bff;
+}
+
+.bottom-bar {
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #1b1e23;
+    padding: 10px 10px;
+    border-radius: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+.bottom-bar button {
+    margin: -10 3px;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.bottom-bar button img {
+    width: 50px;
+    height: 50px;
+    filter: brightness(0) invert(1);
+}
+
+.bottom-bar button:hover img {
+    filter: brightness(0.8) invert(1);
+}
+
+.flight-icon {
+    cursor: pointer;
+}
+#darkForm {
+    background-color: #2a2a2a;
+    color: #f1f1f1;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    width: 100%; /* Full width */
+    max-width: none; /* Hapus batas max-width */
+    margin: 0 auto;
+    box-sizing: border-box; /* Memastikan padding tidak menambah lebar */
+}
+
+#darkForm .form-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #bbb;
+    margin-bottom: 8px;
+    display: block;
+}
+
+#darkForm .form-input {
+    background-color: #444;
+    color: #f1f1f1;
+    border: 1px solid #555;
+    border-radius: 6px;
+    padding: 10px;
+    width: 100%; /* Input juga full width */
+    margin-bottom: 15px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-sizing: border-box; /* Agar padding tidak mempengaruhi lebar */
+}
+
+#darkForm .form-input:focus {
+    border-color: #007bff;
+    outline: none;
+    background-color: #555;
+}
+
+#darkForm .submit-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 100%; /* Tombol juga full width */
+    margin-top: 10px;
+}
+
+#darkForm .submit-btn:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+#darkForm .submit-btn:active {
+    background-color: #003f7f;
+    transform: translateY(0);
+}
+
+#darkForm .form-input::placeholder {
+    color: #aaa;
+}
+#popup-content {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 10px 10px;
+    margin-bottom: 20px;
+}
+/* Styling Form dalam Popup */
+#statusUpdateForm {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Label Form */
+#statusUpdateForm .form-label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #ccc;
+}
+
+/* Input dan Select */
+#statusUpdateForm .form-input {
+    background-color: #2b2b2b;
+    color: #f1f1f1;
+    border: 1px solid #444;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+#statusUpdateForm .form-input:focus {
+    border-color: #00aaff;
+    background-color: #333;
+    outline: none;
+}
+
+/* Textarea */
+#statusUpdateForm textarea.form-input {
+    resize: none;
+    height: 100px;
+}
+
+/* Tombol Submit */
+#statusUpdateForm .submit-btn {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-align: center;
+}
+
+#statusUpdateForm .submit-btn:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+#statusUpdateForm .submit-btn:active {
+    background-color: #003f7f;
+    transform: translateY(0);
+}
+#popup-content-status {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 10px 10px;
+    margin-bottom: 20px;
+}
+/* Popup Content Notification Styling */
+.popup-content-notif {
+    font-size: 16px;
+    background-color: #1e1e1e; /* Dark background for modern look */
+    padding: 20px;
+    border-radius: 10px;
+    color: #eaeaea; /* Light gray text for better readability */
+    line-height: 1.8;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4); /* Deeper shadow for pop effect */
+    border: 1px solid #333; /* Subtle border for structure */
+}
+
+/* Text Styling */
+.popup-content-notif strong {
+    font-size: 18px;
+    color: #00ccff; /* Vibrant blue for headings */
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.popup-content-notif span {
+    color: #ffcc00; /* Yellow for key data highlights */
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* Paragraph Spacing */
+.popup-content-notif p {
+    margin: 0 0 15px 0; /* Consistent spacing between paragraphs */
+}
+
+/* Layout Improvements */
+.popup-content-notif {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Adds spacing between sections */
+}
+
+.popup-content-notif p span {
+    display: inline-block;
+    margin-left: 10px;
+    font-style: italic;
+    color: #f0f0f0; /* Slightly lighter text for remarks */
+}
+.notification-title {
+    color: white;
+}
+.notification-subtitle {
+    color: white;
+}
+/* Styling for Image Section */
+.popup-image {
+    margin: 20px; /* Add spacing around the image section */
+    border-radius: 8px; /* Optional: Rounded corners for the image */
+    overflow: hidden; /* Ensure content stays within rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Optional: Shadow for visual enhancement */
+}
+
+.popup-image img {
+    display: block; /* Remove extra space below the image */
+    width: 100%; /* Ensure the image takes the full width of its container */
+    height: auto; /* Maintain aspect ratio */
+    border: 2px solid #444; /* Optional: Border around the image */
+}
+
+/* Popup Content for MPSR */
+#popup-content-mpsr {
+    font-size: 16px;
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 10px;
+    color: #eaeaea;
+    line-height: 1.6;
+}
+
+.report-options {
+    margin-bottom: 20px;
+}
+
+.report-options .form-label {
+    color: #ccc;
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.report-options .form-input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #555;
+    background-color: #333;
+    color: #fff;
+    border-radius: 5px;
+}
+
+.report-download p {
+    color: #00ccff;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.submit-btn {
+    background-color: #0066cc;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.submit-btn:hover {
+    background-color: #005bb5;
+}
+#popup-content-mpsr {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 10px 10px;
+    margin-bottom: 20px;
+}
+#popup-content-commands {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 10px 10px;
+    margin-bottom: 20px;
+}
