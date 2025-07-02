@@ -1,14 +1,49 @@
-// Inisialisasi Peta
-const map = L.map("map").setView([-5.5489, 111.0149], 7);
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "&copy; OpenStreetMap contributors",
-}).addTo(map);
+// Inisialisasi peta
+const map = L.map("map").setView([-6.1751, 106.865], 9);
 
-// WebSocket
+const baseLayers = {
+    streets: L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"),
+    satellite: L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+    ),
+    dark: L.tileLayer(
+        "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png",
+        {
+            attribution: "&copy; OpenStreetMap & Stadia Maps",
+        }
+    ),
+    dark2: L.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+    ),
+    topographic: L.tileLayer(
+        "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
+    ),
+    hybrid: L.tileLayer("https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"),
+};
+
+let currentBaseLayer = baseLayers.dark;
+currentBaseLayer.addTo(map);
+
+// Layer Control (Legend)
+L.control.layers(baseLayers).addTo(map);
+L.control.scale().addTo(map);
+L.control.fullscreen().addTo(map);
+L.control.locate().addTo(map);
+L.control
+    .measure({
+        primaryLengthUnit: "kilometers",
+        primaryAreaUnit: "hectares",
+    })
+    .addTo(map);
+L.Control.geocoder().addTo(map);
+
 const socket = new WebSocket("ws://127.0.0.1:8080");
 const markers = {};
+const trackPoints = {};
+const trackLines = {};
+let activeTrailId = null;
+let selectedAircraftId = null;
 
-// Update Marker Pesawat
 function updateMarker(flightData) {
     const {
         latitude,
@@ -21,6 +56,14 @@ function updateMarker(flightData) {
         callsign,
         onGround,
         verticalSpeed,
+        icao24bit,
+        registration,
+        time,
+        originAirportIata,
+        destinationAirportIata,
+        number,
+        airlineIata,
+        airlineIcao,
     } = flightData;
 
     if (
@@ -36,40 +79,42 @@ function updateMarker(flightData) {
     }
 
     const endPos = L.latLng(latitude, longitude);
-    const duration = 4000;
+    const duration = 2000;
     const iconHTML = `
-                <div style="transform: rotate(${heading}deg); width: 25px; height: 30px;">
-                    <img src="home/assets/images/plane.png" style="width: 100%; height: 100%;" alt="plane" />
-                </div>
-            `;
+        <div style="transform: rotate(${heading}deg); width: 25px; height: 30px;">
+            <img src="home/assets/images/plane.png" style="width: 100%; height: 100%;" alt="plane" />
+        </div>
+    `;
     const icon = L.divIcon({
         className: "flight-icon",
         html: iconHTML,
     });
 
-    map.on("click", () => {
-        document.getElementById("leftPopupMenuP").classList.remove("active");
-    });
-
     if (!markers[id]) {
-        markers[id] = L.marker([latitude, longitude], {
-            icon,
-        }).addTo(map);
-        markers[id].on("click", () => showFlightDetails(flightData));
+        markers[id] = L.marker([latitude, longitude], { icon }).addTo(map);
+        markers[id].on("click", () => showFlightDetails(flightData, id));
+        trackPoints[id] = [];
+        trackLines[id] = null;
     } else {
         const startPos = markers[id].getLatLng();
         interpolateMarker(markers[id], startPos, endPos, duration, () => {
             markers[id].setIcon(icon);
+            if (activeTrailId === id && trackLines[id]) {
+                trackPoints[id].push([latitude, longitude]);
+                trackLines[id].setLatLngs(trackPoints[id]);
+            }
         });
+    }
+
+    if (selectedAircraftId === id) {
+        updatePopupContent(flightData);
     }
 }
 
-//informasi data
-function showFlightDetails(flightData) {
+function updatePopupContent(flightData) {
     const {
         latitude,
         longitude,
-        id,
         icao24bit,
         heading,
         altitude,
@@ -87,7 +132,6 @@ function showFlightDetails(flightData) {
         airlineIcao,
     } = flightData;
 
-    // Bisa kamu format waktu timestamp jadi readable juga jika perlu
     const timeString = new Date(time * 1000).toLocaleString();
 
     const popupContentP = `
@@ -106,11 +150,30 @@ function showFlightDetails(flightData) {
         <strong>Latitude:</strong> ${latitude}<br>
         <strong>Longitude:</strong> ${longitude}<br>
         <strong>ICAO 24-bit:</strong> ${icao24bit}<br>
-        <strong>ID:</strong> ${id}<br>
         <strong>Timestamp:</strong> ${timeString}
     `;
 
     document.getElementById("popupContentP").innerHTML = popupContentP;
+}
+
+function showFlightDetails(flightData, id) {
+    selectedAircraftId = id;
+
+    if (activeTrailId && trackLines[activeTrailId]) {
+        map.removeLayer(trackLines[activeTrailId]);
+        trackPoints[activeTrailId] = [];
+        trackLines[activeTrailId] = null;
+    }
+
+    trackPoints[id] = [markers[id].getLatLng()];
+    trackLines[id] = L.polyline(trackPoints[id], {
+        color: "cyan",
+        weight: 2,
+    }).addTo(map);
+
+    activeTrailId = id;
+
+    updatePopupContent(flightData);
     document.getElementById("leftPopupMenuP").classList.add("active");
 }
 
@@ -145,38 +208,67 @@ socket.onopen = () => console.log("WebSocket terhubung");
 socket.onerror = (error) => console.error("WebSocket error:", error.message);
 socket.onclose = () => console.log("WebSocket ditutup");
 
-// Brightness Control
-document.getElementById("brightnessRange").addEventListener("input", (e) => {
-    document.getElementById(
-        "map"
-    ).style.filter = `brightness(${e.target.value})`;
+// Brightness Control Tool
+L.Control.Brightness = L.Control.extend({
+    onAdd: function (map) {
+        const container = L.DomUtil.create(
+            "div",
+            "leaflet-bar leaflet-control leaflet-control-custom"
+        );
+        const slider = L.DomUtil.create("input", "", container);
+        slider.type = "range";
+        slider.min = "50";
+        slider.max = "150";
+        slider.value = "100";
+        slider.title = "Brightness";
+
+        slider.style.width = "100px";
+        slider.style.margin = "5px";
+
+        L.DomEvent.disableClickPropagation(container);
+
+        slider.addEventListener("input", (e) => {
+            const value = e.target.value;
+            const tiles = document.querySelectorAll(".leaflet-tile");
+            tiles.forEach((tile) => {
+                tile.style.filter = `brightness(${value}%)`;
+            });
+        });
+
+        return container;
+    },
+
+    onRemove: function (map) {},
 });
 
-// Map Modes
-const baseLayers = {
-    streets: L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"),
-    satellite: L.tileLayer(
-        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-    ),
-    dark: L.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-    ),
-    topographic: L.tileLayer(
-        "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
-    ),
-    hybrid: L.tileLayer("https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"),
+L.control.brightness = function (opts) {
+    return new L.Control.Brightness(opts);
 };
+L.control.brightness({ position: "topright" }).addTo(map);
 
+// Map Modes
 function setMapMode(mode) {
-    map.eachLayer((layer) => map.removeLayer(layer));
-    if (baseLayers[mode]) baseLayers[mode].addTo(map);
+    if (currentBaseLayer) {
+        map.removeLayer(currentBaseLayer);
+    }
+    if (baseLayers[mode]) {
+        currentBaseLayer = baseLayers[mode];
+        currentBaseLayer.addTo(map);
+    }
 }
 
-// Popup Menu Control
 function closeAllPopups() {
     document
         .querySelectorAll(".left-popup-menu")
         .forEach((p) => p.classList.remove("active"));
+
+    if (activeTrailId && trackLines[activeTrailId]) {
+        map.removeLayer(trackLines[activeTrailId]);
+        trackPoints[activeTrailId] = [];
+        trackLines[activeTrailId] = null;
+        activeTrailId = null;
+        selectedAircraftId = null;
+    }
 }
 
 function togglePopup(id) {
@@ -186,7 +278,6 @@ function togglePopup(id) {
     if (!isActive) popup.classList.add("active");
 }
 
-// Aliases for specific popups
 const togglePopupMenu = () => togglePopup("popupMenu");
 const toggleLoginPopup = () => togglePopup("loginPopup");
 const toggleLeftPopupMenu = () => togglePopup("leftPopupMenu");

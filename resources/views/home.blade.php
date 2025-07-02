@@ -39,7 +39,7 @@
                 <img src="{{ asset('home/assets/images/satelit.png') }}" alt="">
                 <div class="label-bottom">SATELLITE</div>
             </div>
-            <div class="map-mode" onclick="setMapMode('dark')">
+            <div class="map-mode" onclick="setMapMode('dark2')">
                 <img src="{{ asset('home/assets/images/dark.png') }}" alt="">
                 <div class="label-bottom">DARK</div>
             </div>
@@ -47,23 +47,11 @@
                 <img src="{{ asset('home/assets/images/topog.png') }}" alt="">
                 <div class="label-bottom">TOPOGRAPHIC</div>
             </div>
-            <div class="map-mode" onclick="setMapMode('topographic')">
-                <img src="{{ asset('home/assets/images/topog.png') }}" alt="">
-                <div class="label-bottom">TOPOGRAPHIC</div>
+            <div class="map-mode" onclick="setMapMode('dark')">
+                <img src="{{ asset('home/assets/images/dark2.png') }}" alt="">
+                <div class="label-bottom">DARK DEFAULT</div>
             </div>
 
-        </div>
-
-        <!-- Brightness Control -->
-        <div class="brightness-control">
-            <label for="brightnessRange">Adjust Map Brightness:</label>
-            <input type="range" id="brightnessRange" min="0.5" max="1.5" step="0.1" value="1">
-        </div>
-
-        Day-Night Control
-        <div class="day-night-control" style="display: none;">
-            <label for="dayNightToggle"></label>
-            <input type="checkbox" id="dayNightToggle">
         </div>
     </div>
 
@@ -80,7 +68,6 @@
         <button onclick="toggleLeftPopupMenuStatus()"><img src="{{ asset('home/assets/images/radarrev.png') }}"></button>
         <button onclick="toggleLeftPopupMenuReport()"><img src="{{ asset('home/assets/images/report.png') }}"></button>
         <button onclick="toggleLeftPopupMenuNotif()"><img src="{{ asset('home/assets/images/notif.png') }}"></button>
-        <button id="btnShowLocation">📍 Show My Location</button>
     </div>
 
 
