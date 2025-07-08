@@ -1,73 +1,55 @@
 @extends('layouts.main')
 
-@section('title', 'Command Center Mpsr')
+@section('title', 'Flight Traking')
 
 @section('maps')
-    <div id="map" class="map"> </div>
-    <!-- popup info pesawat -->
-    <div class="left-popup-menu" id="leftPopupMenuP">
-        <div class="popup-pesawat-header">
-            <div>
-                <button class="close-btn" onclick="toggleLeftPopupMenuP()">&times;</button>
+    <div id="mapContainer" style="position: relative; width: 100%; height: 100%;">
+        <!-- MAP -->
+        <div id="map" class="map">
+            <!-- popup info pesawat -->
+            <div class="left-popup-menu" id="leftPopupMenuP">
+                <div class="popup-pesawat-header">
+                    <div>
+                        <button class="close-btn" onclick="toggleLeftPopupMenuP()">&times;</button>
+                    </div>
+                </div>
+                <div class="popup-content-pesawat" id="popupContentP"></div>
             </div>
         </div>
-        <div class="popup-content-pesawat" id="popupContentP"></div>
-    </div>
 
+        <div id="coordinate"></div>
 
-    <!-- pop up pilih map -->
-    <div class="left-popup-menu" id="leftPopupMenu">
-        <button class="close-btn" onclick="toggleLeftPopupMenu()">&times;</button>
-
-        <!-- Popup Header -->
-        <div class="popup-header">Settings</div>
-
-        <!-- Popup Content -->
-        <div class="judul">
-            <h2>MAP STYLE</h2>
+        <!-- Map mode button -->
+        <div id="mapModeBtn" class="leaflet-bar leaflet-control leaflet-control-custom"
+            style="bottom: 50px; left: 10px; position: absolute; z-index: 1000;">
+            <img src="{{ asset('home/assets/images/layers.png') }}" style="width: 30px; height: 30px;" alt="Map Mode">
         </div>
-        <div class="popup-content">
-            <div class="map-mode" onclick="setMapMode('streets')">
-                <img src="{{ asset('home/assets/images/default.png') }}" alt="">
-                <div class="label-bottom">DEFAULT</div>
-            </div>
-            <div class="map-mode" onclick="setMapMode('hybrid')">
-                <img src="{{ asset('home/assets/images/hybrid.png') }}" alt="">
-                <div class="label-bottom">HYBRID</div>
-            </div>
-            <div class="map-mode" onclick="setMapMode('satellite')">
-                <img src="{{ asset('home/assets/images/satelit.png') }}" alt="">
-                <div class="label-bottom">SATELLITE</div>
-            </div>
-            <div class="map-mode" onclick="setMapMode('dark2')">
-                <img src="{{ asset('home/assets/images/dark.png') }}" alt="">
-                <div class="label-bottom">DARK</div>
-            </div>
-            <div class="map-mode" onclick="setMapMode('topographic')">
-                <img src="{{ asset('home/assets/images/topog.png') }}" alt="">
-                <div class="label-bottom">TOPOGRAPHIC</div>
-            </div>
-            <div class="map-mode" onclick="setMapMode('dark')">
-                <img src="{{ asset('home/assets/images/dark2.png') }}" alt="">
-                <div class="label-bottom">DARK DEFAULT</div>
-            </div>
 
+        <!-- Map mode menu -->
+        <div id="mapModeMenu"
+            style="display: none; position: absolute; bottom: 60px; left: 10px; background: rgba(0,0,0,0.8); color: white; padding: 5px; border-radius: 5px; z-index: 1001;">
+            <div class="mode-option" data-mode="streets">Streets</div>
+            <div class="mode-option" data-mode="satellite">Satellite</div>
+            <div class="mode-option" data-mode="dark">Dark</div>
+            <div class="mode-option" data-mode="dark2">Dark 2</div>
+            <div class="mode-option" data-mode="topographic">Topographic</div>
+            <div class="mode-option" data-mode="hybrid">Hybrid</div>
         </div>
-    </div>
 
-    <!-- popup menu weather -->
-    <div class="left-popup-menu" id="leftPopupMenuWeather">
-        <button class="close-btn" onclick="toggleLeftPopupMenuWeather()">&times;</button>
-        <div class="popup-header">Weather</div>
-    </div>
-@endsection
-@section('bar')
-    <div class="bottom-bar">
-        <button onclick="toggleLeftPopupMenu()"><img src="{{ asset('home/assets/images/settings.png') }}"></button>
-        <button onclick="toggleLeftPopupMenuWeather()"><img src="{{ asset('home/assets/images/weather.png') }}"></button>
-        <button onclick="toggleLeftPopupMenuStatus()"><img src="{{ asset('home/assets/images/radarrev.png') }}"></button>
-        <button onclick="toggleLeftPopupMenuReport()"><img src="{{ asset('home/assets/images/report.png') }}"></button>
-        <button onclick="toggleLeftPopupMenuNotif()"><img src="{{ asset('home/assets/images/notif.png') }}"></button>
+        <!-- Fullscreen button -->
+        <div id="fullscreenBtn" class="leaflet-bar leaflet-control leaflet-control-custom"
+            style="bottom: 20px; right: 10px; position: absolute; z-index: 1000; cursor: pointer;">
+            <img id="fullscreenIcon" src="{{ asset('home/assets/images/full.png') }}" style="width: 30px; height: 30px;"
+                alt="Fullscreen">
+        </div>
+        <div class="">
+            <label
+                style="position: absolute; top: 10px; right: 10px; z-index: 9999; background: rgba(255,255,255,0.7); padding: 5px 10px; border-radius: 8px;">
+                <input type="checkbox" id="toggleSave" />
+                Simpan ke Database
+            </label>
+        </div>
+
     </div>
 
 
